@@ -81,7 +81,7 @@ int vnodeLoadInfo(const char* dir, SVnodeInfo* pInfo);
 int vnodeSyncCommit(SVnode* pVnode);
 int vnodeAsyncCommit(SVnode* pVnode);
 
-// vnodeCommit ====================
+// vnodeSync ====================
 int32_t   vnodeSyncOpen(SVnode* pVnode, char* path);
 int32_t   vnodeSyncStart(SVnode* pVnode);
 void      vnodeSyncClose(SVnode* pVnode);

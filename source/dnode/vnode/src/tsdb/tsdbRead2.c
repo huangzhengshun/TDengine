@@ -14,7 +14,7 @@
  */
 
 #include "tsdb.h"
-#if 0
+
 #define EXTRA_BYTES                2
 #define ASCENDING_TRAVERSE(o)      (o == TSDB_ORDER_ASC)
 #define QH_GET_NUM_OF_COLS(handle) ((size_t)(taosArrayGetSize((handle)->pColumns)))
@@ -97,7 +97,7 @@ typedef struct SIOCostSummary {
   int64_t headFileLoadTime;
 } SIOCostSummary;
 
-typedef struct STsdbReadHandle {
+struct STsdbReadHandle {
   STsdb*          pTsdb;
   SQueryFilePos   cur;  // current position
   int16_t         order;
@@ -130,7 +130,7 @@ typedef struct STsdbReadHandle {
   SArray*        prev;  // previous row which is before than time window
   SArray*        next;  // next row which is after the query time window
   SIOCostSummary cost;
-} STsdbReadHandle;
+};
 
 typedef struct STableGroupSupporter {
   int32_t    numOfCols;
@@ -1489,10 +1489,6 @@ static void mergeTwoRowFromMem(STsdbReadHandle* pTsdbReadHandle, int32_t capacit
   if (pSchema1 == NULL) {
     pSchema1 = metaGetTbTSchema(REPO_META(pTsdbReadHandle->pTsdb), uid, TD_ROW_SVER(row1));
   }
-
-#ifdef TD_DEBUG_PRINT_ROW
-  tdSRowPrint(row1, pSchema1, __func__);
-#endif
 
   if (isRow1DataRow) {
     numOfColsOfRow1 = schemaNCols(pSchema1);
@@ -4113,5 +4109,4 @@ static void queryIndexlessColumn(SSkipList* pSkipList, tQueryInfo* pQueryInfo, S
 //  //apply the hierarchical filter expression to every node in skiplist to find the qualified nodes
 //  applyFilterToSkipListNode(pSkipList, pExpr, result, param);
 //}
-#endif
 #endif

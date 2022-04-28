@@ -92,31 +92,58 @@ int         metaTbCursorNext(SMTbCursor *pTbCur);
 #endif
 
 // tsdb
-typedef struct STsdb STsdb;
-typedef void        *tsdbReaderT;
+// typedef struct STsdb STsdb;
+// typedef void        *tsdbReaderT;
+
+// #define BLOCK_LOAD_OFFSET_SEQ_ORDER 1
+// #define BLOCK_LOAD_TABLE_SEQ_ORDER  2
+// #define BLOCK_LOAD_TABLE_RR_ORDER   3
+
+// tsdbReaderT *tsdbQueryTables(STsdb *tsdb, SQueryTableDataCond *pCond, STableGroupInfo *tableInfoGroup, uint64_t qId,
+//                              uint64_t taskId);
+// tsdbReaderT  tsdbQueryCacheLast(STsdb *tsdb, SQueryTableDataCond *pCond, STableGroupInfo *groupList, uint64_t qId,
+//                                 void *pMemRef);
+// int32_t      tsdbGetFileBlocksDistInfo(tsdbReaderT *pReader, STableBlockDistInfo *pTableBlockInfo);
+// bool         isTsdbCacheLastRow(tsdbReaderT *pReader);
+// int32_t      tsdbQuerySTableByTagCond(void *pMeta, uint64_t uid, TSKEY skey, const char *pTagCond, size_t len,
+//                                       int16_t tagNameRelType, const char *tbnameCond, STableGroupInfo *pGroupInfo,
+//                                       SColIndex *pColIndex, int32_t numOfCols, uint64_t reqId, uint64_t taskId);
+// int64_t      tsdbGetNumOfRowsInMemTable(tsdbReaderT *pHandle);
+// bool         tsdbNextDataBlock(tsdbReaderT pTsdbReadHandle);
+// void         tsdbRetrieveDataBlockInfo(tsdbReaderT *pTsdbReadHandle, SDataBlockInfo *pBlockInfo);
+// int32_t      tsdbRetrieveDataBlockStatisInfo(tsdbReaderT *pTsdbReadHandle, SColumnDataAgg **pBlockStatis);
+// SArray      *tsdbRetrieveDataBlock(tsdbReaderT *pTsdbReadHandle, SArray *pColumnIdList);
+// void         tsdbResetReadHandle(tsdbReaderT queryHandle, SQueryTableDataCond *pCond);
+// void         tsdbDestroyTableGroup(STableGroupInfo *pGroupList);
+// int32_t      tsdbGetOneTableGroup(void *pMeta, uint64_t uid, TSKEY startKey, STableGroupInfo *pGroupInfo);
+// int32_t      tsdbGetTableGroupFromIdList(STsdb *tsdb, SArray *pTableIdList, STableGroupInfo *pGroupInfo);
+
+// for vnode read
+typedef void                  *tsdbReaderT;
+typedef struct STsdbReadHandle STsdbReadHandle;
 
 #define BLOCK_LOAD_OFFSET_SEQ_ORDER 1
 #define BLOCK_LOAD_TABLE_SEQ_ORDER  2
 #define BLOCK_LOAD_TABLE_RR_ORDER   3
 
-tsdbReaderT *tsdbQueryTables(STsdb *tsdb, SQueryTableDataCond *pCond, STableGroupInfo *tableInfoGroup, uint64_t qId,
-                             uint64_t taskId);
-tsdbReaderT  tsdbQueryCacheLast(STsdb *tsdb, SQueryTableDataCond *pCond, STableGroupInfo *groupList, uint64_t qId,
-                                void *pMemRef);
-int32_t      tsdbGetFileBlocksDistInfo(tsdbReaderT *pReader, STableBlockDistInfo *pTableBlockInfo);
-bool         isTsdbCacheLastRow(tsdbReaderT *pReader);
-int32_t      tsdbQuerySTableByTagCond(void *pMeta, uint64_t uid, TSKEY skey, const char *pTagCond, size_t len,
-                                      int16_t tagNameRelType, const char *tbnameCond, STableGroupInfo *pGroupInfo,
-                                      SColIndex *pColIndex, int32_t numOfCols, uint64_t reqId, uint64_t taskId);
-int64_t      tsdbGetNumOfRowsInMemTable(tsdbReaderT *pHandle);
-bool         tsdbNextDataBlock(tsdbReaderT pTsdbReadHandle);
-void         tsdbRetrieveDataBlockInfo(tsdbReaderT *pTsdbReadHandle, SDataBlockInfo *pBlockInfo);
-int32_t      tsdbRetrieveDataBlockStatisInfo(tsdbReaderT *pTsdbReadHandle, SColumnDataAgg **pBlockStatis);
-SArray      *tsdbRetrieveDataBlock(tsdbReaderT *pTsdbReadHandle, SArray *pColumnIdList);
-void         tsdbResetReadHandle(tsdbReaderT queryHandle, SQueryTableDataCond *pCond);
-void         tsdbDestroyTableGroup(STableGroupInfo *pGroupList);
-int32_t      tsdbGetOneTableGroup(void *pMeta, uint64_t uid, TSKEY startKey, STableGroupInfo *pGroupInfo);
-int32_t      tsdbGetTableGroupFromIdList(STsdb *tsdb, SArray *pTableIdList, STableGroupInfo *pGroupInfo);
+tsdbReaderT *tdQueryTables(SVnode *pVnode, SQueryTableDataCond *pCond, STableGroupInfo *tableInfoGroup, uint64_t qId,
+                           uint64_t taskId);
+tsdbReaderT tdQueryCacheLast(SVnode *pVnode, SQueryTableDataCond *pCond, STableGroupInfo *groupList, uint64_t qId,
+                             void *pMemRef);
+int32_t     tdGetFileBlocksDistInfo(tsdbReaderT *pReader, STableBlockDistInfo *pTableBlockInfo);
+bool         isTdCacheLastRow(tsdbReaderT *pReader);
+int32_t      tdQuerySTableByTagCond(void *pMeta, uint64_t uid, TSKEY skey, const char *pTagCond, size_t len,
+                                    int16_t tagNameRelType, const char *tbnameCond, STableGroupInfo *pGroupInfo,
+                                    SColIndex *pColIndex, int32_t numOfCols, uint64_t reqId, uint64_t taskId);
+int64_t     tdGetNumOfRowsInMemTable(tsdbReaderT *pHandle);
+bool        tdNextDataBlock(tsdbReaderT pTsdbReadHandle);
+void        tdRetrieveDataBlockInfo(tsdbReaderT *pTsdbReadHandle, SDataBlockInfo *pBlockInfo);
+int32_t     tdRetrieveDataBlockStatisInfo(tsdbReaderT *pTsdbReadHandle, SColumnDataAgg **pBlockStatis);
+SArray     *tdRetrieveDataBlock(tsdbReaderT *pTsdbReadHandle, SArray *pColumnIdList);
+void        tdResetReadHandle(tsdbReaderT queryHandle, SQueryTableDataCond *pCond);
+void        tdDestroyTableGroup(STableGroupInfo *pGroupList);
+int32_t     tdGetOneTableGroup(void *pMeta, uint64_t uid, TSKEY startKey, STableGroupInfo *pGroupInfo);
+int32_t     tdGetTableGroupFromIdList(SVnode *pVnode, SArray *pTableIdList, STableGroupInfo *pGroupInfo);
 
 // tq
 

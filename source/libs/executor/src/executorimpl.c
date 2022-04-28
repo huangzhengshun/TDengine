@@ -6868,9 +6868,9 @@ int32_t doCreateTableGroup(void* metaHandle, int32_t tableType, uint64_t tableUi
                            uint64_t queryId, uint64_t taskId) {
   int32_t code = 0;
   if (tableType == TSDB_SUPER_TABLE) {
-    code = tsdbQuerySTableByTagCond(metaHandle, tableUid, 0, NULL, 0, 0, NULL, pGroupInfo, NULL, 0, queryId, taskId);
+    code = tdQuerySTableByTagCond(metaHandle, tableUid, 0, NULL, 0, 0, NULL, pGroupInfo, NULL, 0, queryId, taskId);
   } else {  // Create one table group.
-    code = tsdbGetOneTableGroup(metaHandle, tableUid, 0, pGroupInfo);
+    code = tdGetOneTableGroup(metaHandle, tableUid, 0, pGroupInfo);
   }
 
   return code;
@@ -6915,7 +6915,7 @@ tsdbReaderT doCreateDataReader(STableScanPhysiNode* pTableScanNode, SReadHandle*
     goto _error;
   }
 
-  return tsdbQueryTables(pHandle->reader, &cond, pTableGroupInfo, queryId, taskId);
+  return tdQueryTables(pHandle->vnode, &cond, pTableGroupInfo, queryId, taskId);
 
 _error:
   terrno = code;

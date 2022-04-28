@@ -201,7 +201,7 @@ int32_t loadDataBlock(SOperatorInfo* pOperator, STableScanInfo* pTableScanInfo, 
     pCost->loadBlockStatis += 1;
 
     SColumnDataAgg* pColAgg = NULL;
-    tsdbRetrieveDataBlockStatisInfo(pTableScanInfo->dataReader, &pColAgg);
+    tdRetrieveDataBlockStatisInfo(pTableScanInfo->dataReader, &pColAgg);
 
     if (pColAgg != NULL) {
       int32_t numOfCols = pBlock->info.numOfCols;
@@ -238,7 +238,7 @@ int32_t loadDataBlock(SOperatorInfo* pOperator, STableScanInfo* pTableScanInfo, 
   pCost->totalCheckedRows += pBlock->info.rows;
   pCost->loadBlocks += 1;
 
-  SArray* pCols = tsdbRetrieveDataBlock(pTableScanInfo->dataReader, NULL);
+  SArray* pCols = tdRetrieveDataBlock(pTableScanInfo->dataReader, NULL);
   if (pCols == NULL) {
     return terrno;
   }
@@ -276,13 +276,13 @@ static SSDataBlock* doTableScanImpl(SOperatorInfo* pOperator, bool* newgroup) {
   SSDataBlock* pBlock = pTableScanInfo->pResBlock;
   *newgroup = false;
 
-  while (tsdbNextDataBlock(pTableScanInfo->dataReader)) {
+  while (tdNextDataBlock(pTableScanInfo->dataReader)) {
     if (isTaskKilled(pOperator->pTaskInfo)) {
       longjmp(pOperator->pTaskInfo->env, TSDB_CODE_TSC_QUERY_CANCELLED);
     }
 
     pTableScanInfo->numOfBlocks += 1;
-    tsdbRetrieveDataBlockInfo(pTableScanInfo->dataReader, &pBlock->info);
+    tdRetrieveDataBlockInfo(pTableScanInfo->dataReader, &pBlock->info);
 
     uint32_t status = 0;
     int32_t  code = loadDataBlock(pOperator, pTableScanInfo, pBlock, &status);
@@ -331,7 +331,7 @@ static SSDataBlock* doTableScan(SOperatorInfo* pOperator, bool* newgroup) {
              GET_TASKID(pTaskInfo), pWin->skey, pWin->ekey);
 
       // do prepare for the next round table scan operation
-      tsdbResetReadHandle(pTableScanInfo->dataReader, &pTableScanInfo->cond);
+      tdResetReadHandle(pTableScanInfo->dataReader, &pTableScanInfo->cond);
     }
   }
 
@@ -339,7 +339,7 @@ static SSDataBlock* doTableScan(SOperatorInfo* pOperator, bool* newgroup) {
   if (pTableScanInfo->current < total) {
     if (pTableScanInfo->cond.order == TSDB_ORDER_ASC) {
       prepareForDescendingScan(pTableScanInfo, pTableScanInfo->pCtx, pTableScanInfo->numOfOutput);
-      tsdbResetReadHandle(pTableScanInfo->dataReader, &pTableScanInfo->cond);
+      tdResetReadHandle(pTableScanInfo->dataReader, &pTableScanInfo->cond);
     }
 
     STimeWindow* pWin = &pTableScanInfo->cond.twindow;
@@ -363,7 +363,7 @@ static SSDataBlock* doTableScan(SOperatorInfo* pOperator, bool* newgroup) {
                GET_TASKID(pTaskInfo), pTaskInfo->window.skey, pTaskInfo->window.ekey);
 
         // do prepare for the next round table scan operation
-        tsdbResetReadHandle(pTableScanInfo->dataReader, &pTableScanInfo->cond);
+        tdResetReadHandle(pTableScanInfo->dataReader, &pTableScanInfo->cond);
       }
     }
   }
@@ -456,8 +456,8 @@ static SSDataBlock* doBlockInfoScan(SOperatorInfo* pOperator, bool* newgroup) {
   tableBlockDist.maxRows = INT_MIN;
   tableBlockDist.minRows = INT_MAX;
 
-  tsdbGetFileBlocksDistInfo(pTableScanInfo->dataReader, &tableBlockDist);
-  tableBlockDist.numOfRowsInMemTable = (int32_t)tsdbGetNumOfRowsInMemTable(pTableScanInfo->dataReader);
+  tdGetFileBlocksDistInfo(pTableScanInfo->dataReader, &tableBlockDist);
+  tableBlockDist.numOfRowsInMemTable = (int32_t)tdGetNumOfRowsInMemTable(pTableScanInfo->dataReader);
 
   SSDataBlock* pBlock = pTableScanInfo->pResBlock;
   pBlock->info.rows = 1;

@@ -96,6 +96,26 @@ int32_t tsdbCreateTSma(STsdb* pTsdb, char* pMsg);
 int32_t tsdbInsertTSmaData(STsdb* pTsdb, int64_t indexUid, const char* msg);
 int     tsdbInsertData(STsdb* pTsdb, int64_t version, SSubmitReq* pMsg, SSubmitRsp* pRsp);
 
+// tsdb read
+tsdbReaderT *tsdbQueryTables(STsdb *tsdb, SQueryTableDataCond *pCond, STableGroupInfo *tableInfoGroup, uint64_t qId,
+                             uint64_t taskId);
+tsdbReaderT  tsdbQueryCacheLast(STsdb *tsdb, SQueryTableDataCond *pCond, STableGroupInfo *groupList, uint64_t qId,
+                                void *pMemRef);
+int32_t      tsdbGetFileBlocksDistInfo(tsdbReaderT *pReader, STableBlockDistInfo *pTableBlockInfo);
+bool         isTsdbCacheLastRow(tsdbReaderT *pReader);
+int32_t      tsdbQuerySTableByTagCond(void *pMeta, uint64_t uid, TSKEY skey, const char *pTagCond, size_t len,
+                                      int16_t tagNameRelType, const char *tbnameCond, STableGroupInfo *pGroupInfo,
+                                      SColIndex *pColIndex, int32_t numOfCols, uint64_t reqId, uint64_t taskId);
+int64_t      tsdbGetNumOfRowsInMemTable(tsdbReaderT *pHandle);
+bool         tsdbNextDataBlock(tsdbReaderT pTsdbReadHandle);
+void         tsdbRetrieveDataBlockInfo(tsdbReaderT *pTsdbReadHandle, SDataBlockInfo *pBlockInfo);
+int32_t      tsdbRetrieveDataBlockStatisInfo(tsdbReaderT *pTsdbReadHandle, SColumnDataAgg **pBlockStatis);
+SArray      *tsdbRetrieveDataBlock(tsdbReaderT *pTsdbReadHandle, SArray *pColumnIdList);
+void         tsdbResetReadHandle(tsdbReaderT queryHandle, SQueryTableDataCond *pCond);
+void         tsdbDestroyTableGroup(STableGroupInfo *pGroupList);
+int32_t      tsdbGetOneTableGroup(void *pMeta, uint64_t uid, TSKEY startKey, STableGroupInfo *pGroupInfo);
+int32_t      tsdbGetTableGroupFromIdList(STsdb *tsdb, SArray *pTableIdList, STableGroupInfo *pGroupInfo);
+
 // tq
 STQ*    tqOpen(const char* path, SVnode* pVnode, SWal* pWal);
 void    tqClose(STQ*);
@@ -154,7 +174,9 @@ struct SVnode {
   SVBufPool* onCommit;
   SVBufPool* onRecycle;
   SMeta*     pMeta;
-  STsdb*     pTsdb;
+  STsdb*     pTsdb;  // generic tsdb, or specific for tsma by the role the vnode
+  STsdb*     pRsmaL1;
+  STsdb*     pRsmaL2;
   SWal*      pWal;
   STQ*       pTq;
   SSink*     pSink;
